@@ -1,0 +1,56 @@
+'name': 'Latte'
+'fileTypes': ['latte']
+'patterns': [
+  {
+    'match': '{(/?block)( (#?\\\w+(\\\|[\\\w\\\|-]*)?) ?)?}'
+    'captures':
+      '1': 'name': 'support.class.macro.latte'
+      '2': 'name': 'variable.block.latte'
+      '4': 'name': 'constant.helper.latte'
+  }
+  {
+    'match': '{(!?\\\$[a-zA-Z]\\\w*).*(\\\|\w+)*}'
+    'captures':
+      '1': 'name': 'variable.other.latte'
+      '2': "name": 'constant.helper.latte'
+  }
+  {
+    'match': '{(control|snippet|form) +(\\\w+) *(.*)}'
+    'captures':
+      '1': 'name': 'support.class.macro.latte'
+      '2': 'name': 'variable.component.latte'
+  }
+  {
+    'match': '{((else)?ifset) +(\\\$[a-zA-Z]\\\w*)}'
+    'captures':
+      '1': 'name': 'support.class.macro.latte'
+      '3': 'name': 'variable.other.latte'
+  }
+  {
+    'match': '{(else|/ifset|/form|/snippet)}'
+    'captures':
+      '1': 'name': 'support.class.macro.latte'
+  }
+  {
+    'match': '{(/?(else)?if)( *(.*))?}'
+    'captures':
+      '1': 'name': 'support.class.macro.latte'
+  }
+  {
+    'match': '{(foreach) +(\\\$[a-zA-Z][\\\w()->]*) +(as) (\\\$[a-zA-Z]\\\w*)}'
+    'captures':
+      '1': 'name': 'support.class.macro.latte'
+      '2': 'name': 'variable.other.latte'
+      '3': 'name': 'support.class.macro.latte'
+      '4': 'name': 'variable.class.macro.latte'
+  }
+  {
+    'match': '{(/foreach)}'
+    'captures':
+      '1': 'name': 'support.class.macro.latte'
+  }
+  {
+    'include': 'text.html.basic'
+  }
+]
+'scopeName': 'text.html.latte'

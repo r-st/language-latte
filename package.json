@@ -1,0 +1,20 @@
+{
+  "name": "language-latte",
+  "version": "0.0.0",
+  "description": "Latte language support in Atom",
+  "author": "Robert Stetka <robert.stetka@gmial.com>",
+  "engines": {
+    "atom": ">0.50.0"
+  },
+  "homepage": "https://github.com/r-st/language-latte",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/r-st/language-latte.git"
+  },
+  "bugs": {
+    "url": "https://github.com/r-st/language-latte/issues"
+  },
+  "license": "MIT",
+  "private": true,
+  "dependencies": {}
+}
