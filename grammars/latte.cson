@@ -9,7 +9,7 @@
       '4': 'name': 'constant.helper.latte'
   }
   {
-    'match': '{(!?\\\$[a-zA-Z]\\\w*).*(\\\|\w+)*}'
+    'match': '{(!?\\\$[a-zA-Z]\\\w*)[^}]*(\\\|\w+)*}'
     'captures':
       '1': 'name': 'variable.other.latte'
       '2': "name": 'constant.helper.latte'
