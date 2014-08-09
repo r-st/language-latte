@@ -2,7 +2,7 @@
 'fileTypes': ['latte']
 'patterns': [
   {
-    'match': '{(/?block)( (#?\\\w+(\\\|[\\\w\\\|-]*)?) ?)?}'
+    'match': '{(/?block|include)( (#?\\\w+(\\\|[\\\w\\\|-]*)?) ?)?}'
     'captures':
       '1': 'name': 'support.class.macro.latte'
       '2': 'name': 'variable.block.latte'
@@ -46,6 +46,23 @@
   }
   {
     'match': '{(/foreach)}'
+    'captures':
+      '1': 'name': 'support.class.macro.latte'
+  }
+  {
+    'match': '{(input) +([a-z]\\\w*)[^}]*}'
+    'captures':
+      '1': 'name': 'support.class.macro.latte'
+      '2': 'name': 'variable.component.latte'
+  }
+  {
+    'match': '{(label) +([a-z]\\\w*)[^}]*/?}'
+    'captures':
+      '1': 'name': 'support.class.macro.latte'
+      '2': 'name': 'variable.component.latte'
+  }
+  {
+    'match': '{(/label)}'
     'captures':
       '1': 'name': 'support.class.macro.latte'
   }
