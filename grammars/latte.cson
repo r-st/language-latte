@@ -67,6 +67,11 @@
       '1': 'name': 'support.class.macro.latte'
   }
   {
+    'begin': '{\\\*'
+    'end': '\\\*}'
+    'name': 'comment.block.latte'
+  }
+  {
     'include': 'text.html.basic'
   }
 ]
