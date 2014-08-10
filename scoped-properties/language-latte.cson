@@ -1,4 +1,6 @@
 '.text.latte':
   'editor':
+    'commentStart': '{\*'
+    'commentEnd': '\*}'
     'increaseIndentPattern': '{(block|snippet|while|label|for(m|each)?|if(set|Current)?).*}'
     'decreaseIndentPattern': '{/(block|snippet|while|label|for(m|each)?|if(set|Current)?)}'
