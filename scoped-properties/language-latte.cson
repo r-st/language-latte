@@ -1,0 +1,4 @@
+'.text.latte':
+  'editor':
+    'increaseIndentPattern': '{(block|snippet|while|label|for(m|each)?|if(set|Current)?).*}'
+    'decreaseIndentPattern': '{/(block|snippet|while|label|for(m|each)?|if(set|Current)?)}'
