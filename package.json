@@ -1,6 +1,6 @@
 {
   "name": "language-latte",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Latte language support in Atom",
   "author": "Robert Stetka <robert.stetka@gmial.com>",
   "engines": {
