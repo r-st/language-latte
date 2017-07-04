@@ -1,76 +1,159 @@
 'name': 'Latte'
 'fileTypes': ['latte']
+# Common patterns (need to be escaped properly):
+#   SINGLE-QUOTED STRINGS (takes into account escaped single quotes inside) ~~> '(?:[^'\\]|\\.)*'
+#   DOUBLE-QUOTED STRINGS (takes into account escaped double quotes inside) ~~> "(?:[^"\\]|\\.)*"
+#   BLOCK NAME: \w+
+#   PHP VALID NAME (CONSTANT/VARIABLE/FUNCTION) ~~> [a-zA-Z_][\w_]*
+#   PHP VALID NUMBER (INTEGER/FLOAT) ~~> [+-]?(?:\d*\.\d+|\d+\.\d*|\d+)(?:[eE][+-]?\d+)?
+# TODO:
+#    - object property (->) or array item ([0]) inside indirection braces. Example: {include basket${$indirect[0]}$ext}
+#    - colorize variable substitutions inside double-quoted strings. Example: {${$indirect}["${$indirectKey}"]}
+#    - literal at the end of compound literal. Example: {includeblock ../#-file/+{$file}.latte}
 'patterns': [
-  {
-    'match': '{(/?block|include)( (#?\\\w+(\\\|[\\\w\\\|-]*)?) ?)?}'
+  { # 1) Single quoted string.
+    # Examples: `'string'`.
+    'match': '((\')((?:[^\'\\\\]|\\\\.)*)(\'))'
     'captures':
-      '1': 'name': 'support.class.macro.latte'
-      '2': 'name': 'variable.block.latte'
-      '4': 'name': 'constant.helper.latte'
+      '1': 'name': 'string.quoted.single.latte'
+      '2': 'name': 'punctuation.definition.string.begin.latte'
+      '3': 'name': 'meta.string-contents.quoted.single.latte'
+      '4': 'name': 'punctuation.definition.string.end.latte'
   }
-  {
-    'match': '{(!?\\\$[a-zA-Z]\\\w*)[^}]*(\\\|\w+)*}'
+  { # 2) Double quoted string.
+    # Examples: `"string"`.
+    'match': '((")((?:[^"\\\\]|\\\\.)*)("))'
+    'captures':
+      '1': 'name': 'string.quoted.double.latte'
+      '2': 'name': 'punctuation.definition.string.begin.latte'
+      '3': 'name': 'meta.string-contents.quoted.double.latte'
+      '4': 'name': 'punctuation.definition.string.end.latte'
+  }
+  { # 3) Array items: literal (string with/out quotes) or numeric (integer).
+    # Examples: `[]`, `[3]`, `[literal]`, `['string']`, `["string"]`.
+    'match': '(\\[) *(?:((\')((?:[^\'\\\\]|\\\\.)*)(\'))|((")((?:[^"\\\\]|\\\\.)*)("))|([a-zA-Z_][\\w_]*)|(\\d+))? *(\\])'
+    'captures':
+      '1': 'name': 'punctuation.section.array.begin.latte'
+      '2': 'name': 'string.quoted.single.latte'
+      '3': 'name': 'punctuation.definition.string.begin.latte'
+      '4': 'name': 'meta.string-contents.quoted.single.latte'
+      '5': 'name': 'punctuation.definition.string.end.latte'
+      '6': 'name': 'string.quoted.double.latte'
+      '7': 'name': 'punctuation.definition.string.begin.latte'
+      '8': 'name': 'meta.string-contents.quoted.double.latte'
+      '9': 'name': 'punctuation.definition.string.end.latte'
+      '10': 'name': 'constant.other.latte'
+      '11': 'name': 'constant.numeric.latte'
+      '12': 'name': 'punctuation.section.array.end.latte'
+  }
+  { # 4) Array literal/numeric keys assignment.
+    # Examples: `[0 => ...]`, `[literal => ...]`.
+    'match': '(?:(array)(\\()|(\\[)|,)? *(?:(\\d+)|([a-zA-Z_][\\w_]*)) *(?==>)'
+    'captures':
+      '1': 'name': 'support.function.construct.latte'
+      '2': 'name': 'punctuation.definition.array.begin.latte'
+      '3': 'name': 'punctuation.section.array.begin.latte'
+      '4': 'name': 'constant.numeric.latte'
+      '5': 'name': 'constant.other.latte'
+  }
+  { # 5) Assignment (variable or array key): numeric (integer/float), literal, string.
+    'match': '(?:(=>)|(=)) *(?:((\')((?:[^\'\\\\]|\\\\.)*)(\'))|((")((?:[^"\\\\]|\\\\.)*)("))|([+-]?(?:\\d*\\.\\d+|\\d+\\.\\d*|\\d+)(?:[eE][+-]?\\d+)?)|([nN][uU][lL][lL]|[fF][aA][lL][sS][eE]|[tT][rR][uU][eE])|([a-zA-Z_][\\w_]*)) *(?=,|\\]|\\)|\\})'
+    'captures':
+      '1': 'name': 'keyword.operator.key.latte'
+      '2': 'name': 'keyword.operator.assignment.latte'
+      '3': 'name': 'string.quoted.single.latte'
+      '4': 'name': 'punctuation.definition.string.begin.latte'
+      '5': 'name': 'meta.string-contents.quoted.single.latte`'
+      '6': 'name': 'punctuation.definition.string.end.latte`'
+      '7': 'name': 'string.quoted.double.latte'
+      '8': 'name': 'punctuation.definition.string.begin.latte'
+      '9': 'name': 'meta.string-contents.quoted.double.latte'
+      '10': 'name': 'punctuation.definition.string.end.latte'
+      '11': 'name': 'constant.numeric.latte'
+      '12': 'name': 'constant.language.latte'
+      '13': 'name': 'constant.other.latte'
+  }
+  { # 6) Class member.
+    # Examples: `$obj->prop`, `$obj->$member`.
+    'match': '(->)(?:([a-zA-Z_][\\w_]*)\\(|((\\$)?[a-zA-Z_][\\w_]*))'
+    'captures':
+      '1': 'name': 'keyword.operator.class.latte'
+      '2': 'name': 'meta.function-call.object.latte'
+      '3': 'name': 'variable.other.property.latte'
+      '4': 'name': 'punctuation.definition.variable.latte'
+  }
+  { # 7) Numeric array item
+    # Examples: `[ 0, 1, 2 ]`, `array( 2 )`.
+    'match': '[\\[(,] *([+-]?(?:\\d*\\.\\d+|\\d+\\.\\d*|\\d+)(?:[eE][+-]?\\d+)?) *(?:(\\))|(\\]))?'
+    'captures':
+      '1': 'name': 'constant.numeric.latte'
+      '2': 'name': 'punctuation.definition.array.end.latte'
+      '3': 'name': 'punctuation.section.array.end.latte'
+  }
+  { # 8) Unmatched operators missed by previous patterns.
+    'match': '(?:(=>)|(=)|(->|::)|(\\[)|(\\])|(;))'
+    'captures':
+      '1': 'name': 'keyword.operator.key.latte'
+      '2': 'name': 'keyword.operator.assignment.latte'
+      '3': 'name': 'keyword.operator.class.latte'
+      '4': 'name': 'punctuation.section.array.begin.latte'
+      '5': 'name': 'punctuation.section.array.end.latte'
+      '6': 'name': 'punctuation.terminator.expression.latte'
+  }
+  { # 9) Foreach loops.
+    'match': '(?:{(\\/)?(foreach)| +(as) +)'
+    'captures':
+      '1': 'name': 'constant.helper.latte'
+      '2': 'name': 'keyword.control.latte'
+      '3': 'name': 'keyword.operator.logical.latte'
+  }
+  { # 10) Variables (taking indirection into account too).
+    'match': '(?:((\\$+)[a-zA-Z_][\\w_]*)|(\\${)((\\$)[a-zA-Z_][\\w_]*)(}))'
     'captures':
       '1': 'name': 'variable.other.latte'
-      '2': "name": 'constant.helper.latte'
+      '2': 'name': 'punctuation.definition.variable.latte'
+      '3': 'name': 'punctuation.definition.variable.latte'
+      '4': 'name': 'variable.other.latte'
+      '5': 'name': 'punctuation.definition.variable.latte'
+      '6': 'name': 'punctuation.definition.variable.latte'
   }
-  {
-    'match': '{(control|snippet|form) +(\\\w+) *(.*)}'
+  { # 11) Class instantiation.
+    'match': '(new) ((?:\\\\?[a-zA-Z_][\\w_]*)*) *\\(\\)'
+    'captures':
+      '1': 'name': 'keyword.other.new.latte'
+      '2': 'name': 'support.class.builtin.latte'
+  }
+  { # 12) Latte filters
+    'match': '\\|([^\\s|}:]+) *'
+    'captures':
+      '1': 'name': 'support.function.classobj.latte'
+  }
+  { # 13) PHP Numbers.
+    'match': '([+-]?(?:\\d*\\.\\d+|\\d+\\.\\d*|\\d+)(?:[eE][+-]?\\d+)?)'
+    'captures':
+      '1': 'name': 'constant.numeric.latte'
+  }
+  { # 14) Latte macros.
+    'match': '{(?:(\\/)(?:(block|cache|capture|form|label|sep|snippet|spaceless)|(else|first|for|if(?:set|Current)?|last|switch|while))|(?:(l|r|sep|spaceless)|(default|first|last)))}'
+    'captures':
+      '1': 'name': 'constant.helper.latte'
+      '2': 'name': 'support.class.macro.latte'
+      '3': 'name': 'keyword.control.latte'
+      '4': 'name': 'support.class.macro.latte'
+      '5': 'name': 'keyword.control.latte'
+  }
+  { # 15) Latte macros: block/cache/capture/contentType/control/debugbreak/default/define/dump/else/elseif/elseifset/extends/form/if/ifCurrent/ifset/include/includeblock/input/inputError/label/layout/link/php/plink/snippet/snippetArea/syntax/switch
+    'match': '(?:{(?:(block|cache|capture|contentType|control|debugbreak|default|define|dump|extends|form|include(?:block)?|input(?:Error)?|label|layout|link|php|plink|snippet(?:Area)?|syntax|var)|(breakIf|case|continueIf|for|(?:else)?ifset|else(?:if)?|if(?:Current)?|switch|while))(?: +(this|parent)| +(#)?([^$\'"{}|=\\s,]+)| *))'
     'captures':
       '1': 'name': 'support.class.macro.latte'
-      '2': 'name': 'variable.component.latte'
+      '2': 'name': 'keyword.control.latte'
+      '3': 'name': 'storage.type.latte'
+      '4': 'name': 'storage.modifier.reference.latte'
+      '5': 'name': 'constant.other.latte'
   }
   {
-    'match': '{((else)?ifset) +(\\\$[a-zA-Z]\\\w*)}'
-    'captures':
-      '1': 'name': 'support.class.macro.latte'
-      '3': 'name': 'variable.other.latte'
-  }
-  {
-    'match': '{(else|/ifset|/form|/snippet)}'
-    'captures':
-      '1': 'name': 'support.class.macro.latte'
-  }
-  {
-    'match': '{(/?(else)?if)( *(.*))?}'
-    'captures':
-      '1': 'name': 'support.class.macro.latte'
-  }
-  {
-    'match': '{(foreach) +(\\\$[a-zA-Z][\\\w()->]*) +(as) (\\\$[a-zA-Z]\\\w*)(\\\s+=>\\\s+(\\\$[a-zA-Z]\\\w*))?}'
-    'captures':
-      '1': 'name': 'support.class.macro.latte'
-      '2': 'name': 'variable.other.latte'
-      '3': 'name': 'support.class.macro.latte'
-      '4': 'name': 'variable.class.macro.latte'
-      '5': 'name': 'support.class.macro.latte'
-      '6': 'name': 'variable.class.macro.latte'
-  }
-  {
-    'match': '{(/foreach)}'
-    'captures':
-      '1': 'name': 'support.class.macro.latte'
-  }
-  {
-    'match': '{(input) +([a-z]\\\w*)[^}]*}'
-    'captures':
-      '1': 'name': 'support.class.macro.latte'
-      '2': 'name': 'variable.component.latte'
-  }
-  {
-    'match': '{(label) +([a-z]\\\w*)[^}]*/?}'
-    'captures':
-      '1': 'name': 'support.class.macro.latte'
-      '2': 'name': 'variable.component.latte'
-  }
-  {
-    'match': '{(/label)}'
-    'captures':
-      '1': 'name': 'support.class.macro.latte'
-  }
-  {
-    'begin': '{\\\*'
-    'end': '\\\*}'
+    'begin': '{\\*'
+    'end': '\\*}'
     'name': 'comment.block.latte'
   }
   {
