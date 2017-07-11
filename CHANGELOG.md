@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.4
+- complete rewrite of grammar (thanks to @cgalvarez)
+
 ## 0.2.1
 ### Bug Fixes
 - HTML tags are indented again
